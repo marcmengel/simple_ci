@@ -1,0 +1,21 @@
+<% fields = ProjectCustomField.find_all_by_field_format('string') %>
+
+<p><label>Project custom field storing CI feed URL</label>
+<%= select_tag 'settings[feed_url_custom_field]',
+               '<option value="">(Select one)</option>' +
+               options_from_collection_for_select(fields, :id, :name, @settings['feed_url_custom_field'].to_i) %><br />
+<em>If this list is empty, go to 'Admin -> Custom fields' and create a <strong>Project 'string' custom field</strong>.<br />
+This custom field is used to store the CI feed URL for each project (in project settings).
+The entered URLs should point to valid RSS 1.0/2.0 feeds.</em>
+
+</p>
+
+<p><label>Successfull build keyword</label>
+<%= text_field_tag 'settings[success_keyword]', @settings['success_keyword'], :size => 60 %><br />
+<em>Used to determine if a build is successfull regarding its RSS title.<br />
+Can be either a keyword or a regular expression (case ignored).</em>
+</p>
+
+<p><label>Show full description of build results</label>
+<%= select_tag 'settings[show_descriptions]',
+               options_for_select([['Always', 2], ['Only for build failures', 1], ['Never', 0]], @settings['show_descriptions'].to_i) %></p>
