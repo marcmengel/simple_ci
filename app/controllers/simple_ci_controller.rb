@@ -25,18 +25,22 @@ class SimpleCiController < ApplicationController
   before_filter :find_project, :authorize
   
   def show
+    #Rails.logger.warn "in show..."
     # Build the regular expression used to detect successfull builds
     success_re = Regexp.new(Setting.plugin_simple_ci['success_keyword'].strip, Regexp::IGNORECASE)
     # Find the project's CI RSS feed URL
     # This URL is stored in a 'regular' project custom field
     feed_url = @project.custom_values.detect {|v| v.custom_field_id == Setting.plugin_simple_ci['feed_url_custom_field'].to_i}
     feed_url = feed_url.value if feed_url
+    #Rails.logger.warn "Got feed_url value of: " + feed_url
     if !feed_url.blank?
       begin
         content = ''
         # Open the feed and parse it
         open(feed_url) do |s| content = s.read end
+        #Rails.logger.warn "read content.. "
         rss = RSS::Parser.parse(content, false)
+        #Rails.logger.warn "parsed.. "
         if rss
           @builds = rss.items.collect do |item|
             build = {:time => item.date,
@@ -52,11 +56,15 @@ class SimpleCiController < ApplicationController
         end
       rescue SocketError
         flash.now[:error] = 'Unable to connect to remote host.'
+      rescue RSS::NotWellFormedError
+        flash.now[:error] = 'Invalid RSS feed.'
       end
     @show_descriptions = Setting.plugin_simple_ci[:show_descriptions].to_i
     else
       flash.now[:error] = 'The feed URL is not defined for this project.'
     end
+    #Rails.logger.warn "builds are: " + @builds.to_s
+    render :show
   end
   
 private

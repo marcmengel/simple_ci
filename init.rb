@@ -17,7 +17,7 @@
 
 require 'redmine'
 
-RAILS_DEFAULT_LOGGER.info 'Starting simple CI plugin for Redmine'
+Rails.logger.info 'Starting simple CI plugin for Redmine'
 
 # Redmine simple CI plugin
 Redmine::Plugin.register :simple_ci do
